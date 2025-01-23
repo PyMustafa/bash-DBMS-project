@@ -5,16 +5,16 @@ gum style --foreground 212 --border-foreground 212 --border double --align cente
 gum style --foreground 156 "Write your SQL command like that:"
 gum style --foreground 39 ". use dbname"
 gum style --foreground 39 ". list database"
-gum style --foreground 39 ". create database dbname"
 gum style --foreground 39 ". drop database dbname"
+gum style --foreground 39 ". create database dbname"
 # gum style --foreground 39 ". drop table tablename"
-# gum style --foreground 39 ". create table tName id(int) name(string) .. "
-
+gum style --foreground 39 ". show tables"
+gum style --foreground 39 ". create table tableName id(int) name(string) .. "
+echo ""
 # Array of valid SQL keywords for each function
-keywords=("create" "drop" "list" "use")
+keywords=("create" "drop" "list" "use" "exit" "show")
 
 while true; do
-
     # take user query and save each word in queryWords array
     query=$(gum input --placeholder "Enter your SQL query (or '0' to quit)" --prompt "> " --width 50)
     gum style --foreground 156 "$query"
@@ -32,8 +32,13 @@ while true; do
             create)
                 if [[ "${queryWords[1]}" == "database" ]]; then
                     createDb
+                
+                elif [[ "${queryWords[1]}" == "table" ]]; then
+                    createTable
+                else
+                    gum style --foreground 196 "Invalid query"  
                 fi
-               ;;
+                ;;
 
             use)
                 useDb
@@ -47,11 +52,17 @@ while true; do
                 dropDb
                 ;;
 
+            exit)
+                exitDb
+                ;;
+
+            show)
+                showTables
+                ;;
+
             *)
                 gum style --foreground 196 "Invalid query"                
                 ;;
-
-
         esac
     else
          gum style --foreground 196 "Invalid query"
