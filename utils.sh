@@ -1,4 +1,4 @@
-normalizeName() {
+normalize_name() {
     local name="$1"
     local max_length=$((NAMEDATALEN - 1))
     
