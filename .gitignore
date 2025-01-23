@@ -1,0 +1,2 @@
+# ignore top-level directories and their contents (e.g., test_db)
+/*/
