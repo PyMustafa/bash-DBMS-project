@@ -64,11 +64,8 @@ use_database() {
 
 # Drop a database
 drop_database() {
-
     local db_name="${queryWords[2]}"
     local current_db_name=$(get_current_db)
-    echo "$current_db"
-    echo "$current_db_name"
     validate_name "$db_name" "database" || return 1
     local normalized_db_name=$(normalize_name "$db_name")
     
@@ -103,6 +100,7 @@ exit_db() {
     success_message "Exited the current database."
 }
 
+# Create a new table
 create_table() {
     local table_name="${queryWords[2]}"
 
@@ -112,7 +110,8 @@ create_table() {
         return
     }
 
-    validate_name "$db_name" "table" || return 1
+    # Validate table name
+    validate_name "$table_name" "table" || return 1
 
     # Check if columns are provided
     [[ -z "${queryWords[@]:3}" ]] && {
@@ -121,7 +120,7 @@ create_table() {
     }
 
     # Check if table already exists
-    [[ -f "$table_name" ]] && {
+    [[ -f "$current_db/$table_name" ]] && {
         error_message "Table '$table_name' already exists."
         return
     }
@@ -172,13 +171,14 @@ create_table() {
     success_message "Table '$table_name' created successfully."
 
     # Store metadata
-    echo "$(IFS=:; echo "${columns[*]}")" > "$table_name"
-    echo "# Columns: ${columns[*]}" >> "$table_name"
-    echo "# Types: ${column_types[*]}" >> "$table_name"
-    echo "# Primary Key: $primary_key" >> "$table_name"
+    echo "$(IFS=:; echo "${columns[*]}")" > "$current_db/$table_name"
+    echo "# Columns: ${columns[*]}" >> "$current_db/$table_name"
+    echo "# Types: ${column_types[*]}" >> "$current_db/$table_name"
+    echo "# Primary Key: $primary_key" >> "$current_db/$table_name"
 }
 
-showTables() {
+# Show tables in the current database
+show_tables() {
     # Validate database context
     [[ -z "$current_db" ]] && {
         error_message "No active database. Use 'use db_name' first."
@@ -191,15 +191,43 @@ showTables() {
         return
     }
 
-    # List tables
-    local tables=($(ls))
+    # List tables in the current database directory
+    local tables=($(ls "$current_db"))
     [[ ${#tables[@]} -eq 0 ]] && {
-        info_message "No tables found in the current directory."
+        info_message "No tables found in the current database."
         return
     }
 
-    info_message "Tables in the current directory:"
+    info_message "Tables in the current database:"
     for table in "${tables[@]}"; do
         info_message "• $table"
     done
+}
+
+# Drop a table
+drop_table() {
+    local table_name="${queryWords[2]}"
+
+    # Validate database context
+    [[ -z "$current_db" ]] && {
+        error_message "No active database. Use 'use db_name' first."
+        return
+    }
+
+    # Validate table name
+    validate_name "$table_name" "table" || return 1
+
+    # Check if table exists
+    [[ ! -f "$current_db/$table_name" ]] && {
+        error_message "Table '$table_name' does not exist."
+        return
+    }
+
+    # Confirm deletion
+    gum confirm "Are you sure you want to delete the table '$table_name'? This action cannot be undone." && {
+        rm -f "$current_db/$table_name"
+        success_message "Table '$table_name' dropped successfully."
+    } || {
+        info_message "Deletion canceled."
+    }
 }

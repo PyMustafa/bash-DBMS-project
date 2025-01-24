@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 . "${SCRIPT_DIR}/utils.sh"
 . "${SCRIPT_DIR}/validators.sh"
 . "${SCRIPT_DIR}/database_functions.sh"
-
+clear
 
 # display welcome message
 gum style --foreground 212 --border-foreground 212 --border double --align center --width 50 --padding "1 3" "Welcome to our DBMS!"
@@ -14,7 +14,7 @@ help_menu() {
     gum style --foreground 39 "CREATE DATABASE <name>"
     gum style --foreground 39 "DROP DATABASE <name>"
     gum style --foreground 39 "USE <database>"
-    gum style --foreground 39 "LIST DATABASE"
+    gum style --foreground 39 "LIST DB"
     gum style --foreground 39 "SHOW TABLES"
     gum style --foreground 39 "CREATE TABLE <name> <columns...>"
     gum style --foreground 39 "EXIT"
@@ -80,6 +80,13 @@ parse_sql_query() {
             ;;
         "show tables")
             show_tables
+            ;;
+        "drop table")
+            [[ ${#queryWords[@]} -eq 3 ]] || {
+                error_message "Usage: DROP TABLE <table_name>"
+                return 1
+            }
+            drop_table
             ;;
         *)
             error_message "Unrecognized command: ${queryWords[*]}"
