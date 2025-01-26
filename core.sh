@@ -16,10 +16,11 @@ help_menu() {
     gum style --foreground 39 "DROP DATABASE <name>"
     gum style --foreground 39 "USE <database>"
     gum style --foreground 39 "LIST DB"
+
+    gum style --foreground 39 "SHOW TABLES"
     gum style --foreground 39 "CREATE TABLE <name> <columns...>"
     gum style --foreground 39 "INSERT INTO <TABLE_NAME> VALUES <value1> <value2> ..."
     gum style --foreground 39 "Avaliable Datatypes: INT,FLOOT,BOOL,STRING"
-    gum style --foreground 39 "SHOW TABLES"
     gum style --foreground 39 "EXIT"
     echo ""
 }
