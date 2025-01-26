@@ -68,3 +68,80 @@ validate_data() {
         *) error_message "Unknown type '$type'"; return 1 ;;
     esac
 }
+
+validate_where_clause() {
+    local tableName="$1"
+    info_message "$tableName"
+    shift
+    local whereClause=("$@")
+    local normalized_tableName=$(normalize_name "$tableName")
+    local metadataFile="$current_db/.$normalized_tableName"
+    info_message "${#whereClause[@]}" 
+    info_message "${whereClause[@]}" 
+    # Validate clause structure
+    if [[ ${#whereClause[@]} -ne 3 ]]; then
+        error_message "Invalid WHERE format. Required: COLUMN OPERATOR VALUE"
+        return 1
+    fi
+
+    local column="${whereClause[0]}"
+    local operator="${whereClause[1]}"
+    local value="${whereClause[2]}"
+
+    # Load metadata
+    if [[ ! -f "$metadataFile" ]]; then
+        error_message "Metadata file for table '$tableName' not found"
+        return 1
+    fi
+
+    # Parse metadata
+    local columns=()
+    local types=()
+    while IFS= read -r line; do
+        case "$line" in
+            columns:*)
+                IFS=',' read -ra cols <<< "${line#columns:}"
+                columns=("${cols[@]}")
+                ;;
+            types:*)
+                IFS=',' read -ra typs <<< "${line#types:}"
+                types=("${typs[@]}")
+                ;;
+        esac
+    done < "$metadataFile"
+
+    # Validate metadata consistency
+    if [[ ${#columns[@]} -ne ${#types[@]} ]]; then
+        error_message "Metadata corruption in '$tableName': Columns/Types mismatch"
+        return 1
+    fi
+
+    # Validate column exists
+    local col_index=-1
+    for i in "${!columns[@]}"; do
+        if [[ "${columns[$i]}" == "$column" ]]; then
+            col_index=$i
+            break
+        fi
+    done
+
+    if [[ $col_index -eq -1 ]]; then
+        error_message "Column '$column' does not exist in table '$tableName'"
+        return 1
+    fi
+
+    # Validate operator
+    case "$operator" in
+        "="|"!="|"<"|">"|"<="|">=") ;;
+        *) error_message "Invalid operator: '$operator'. Supported: = != < > <= >="
+        return 1 ;;
+    esac
+
+    # Get column type and validate value
+    local column_type="${types[$col_index]}"
+    validate_data "$value" "$column_type" || return 1
+    
+    
+
+    return 0
+}

@@ -115,7 +115,7 @@ create_table() {
     fi
 
     local table_name="${queryWords[2]}"
-    local metadata_file="${current_db}/.${table_name}_metadata"
+    local metadata_file="${current_db}/.${table_name}"
     local data_file="${current_db}/${table_name}.csv"
 
     # Check if table already exists
