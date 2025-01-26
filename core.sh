@@ -16,11 +16,14 @@ help_menu() {
     gum style --foreground 39 "DROP DATABASE <name>"
     gum style --foreground 39 "USE <database>"
     gum style --foreground 39 "LIST DB"
-    gum style --foreground 39 "SHOW TABLES"
     gum style --foreground 39 "CREATE TABLE <name> <columns...>"
+    gum style --foreground 39 "INSERT INTO <TABLE_NAME> VALUES <value1> <value2> ..."
+    gum style --foreground 39 "Avaliable Datatypes: INT,FLOOT,BOOL,STRING"
+    gum style --foreground 39 "SHOW TABLES"
     gum style --foreground 39 "EXIT"
     echo ""
 }
+
 parse_sql_query() {
     local query="$1"
     # convert query to lowercase and split into words
@@ -86,8 +89,10 @@ parse_sql_query() {
                 error_message "Usage: CREATE TABLE <name> <columns...>"
                 return 1
             }
-            create_table "${queryWords[@]:2}"
+            # create_table "${queryWords[@]:2}"
+            create_table "${queryWords[@]}"
             ;;
+        
         "show tables")
             show_tables
             ;;
@@ -97,6 +102,13 @@ parse_sql_query() {
                 return 1
             }
             drop_table
+            ;;
+         "insert into")
+            [[ ${#queryWords[@]} -ge 4 ]] || {
+                error_message "Usage: INSERT INTO <table_name> VALUES <value1> <value2> ..."
+                return 1
+            }
+            insert_into_table "${queryWords[2]}" "${queryWords[@]:4}"
             ;;
         *)
             error_message "Invalid input: ${queryWords[*]}"
@@ -108,7 +120,7 @@ parse_sql_query() {
 main() {
     gum style --foreground 141 "'exit' to exit the DBMS, '-help' for help menu"
     # Array of valid SQL keywords for each function
-    keywords=("create" "drop" "list" "use" "exit" "show")
+    keywords=("create" "drop" "list" "use" "exit" "show" "insert")
 
     while true; do
         query=$(gum input --placeholder "Enter SQL query" --prompt "> ")

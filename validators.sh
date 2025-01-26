@@ -2,7 +2,6 @@
 source sql_config.sh
 source utils.sh
 
-
 # function to validate table, column and database names
 # usage: validate_name "name" "type", type can be table, column or database
 validate_name() {
@@ -29,4 +28,43 @@ validate_name() {
         return 1
     }
     return 0
+}
+
+validate_int() {
+    [[ "$1" =~ ^-?[0-9]+$ ]] || {
+        error_message "'$1' is not a valid integer."
+        return 1
+    }
+}
+
+validate_float() {
+    [[ "$1" =~ ^-?[0-9]+(\.[0-9]+)?$ ]] || {
+        error_message "'$1' is not a valid float."
+        return 1
+    }
+}
+
+validate_bool() {
+    [[ "$1" =~ ^(true|false)$ ]] || {
+        error_message "'$1' is not a valid boolean (true/false)."
+        return 1
+    }
+}
+
+validate_string() {
+    # No validation needed for strings by default
+    return 0
+}
+
+validate_data() {
+    local value="$1"
+    local type="$2"
+
+    case "$type" in
+        int) validate_int "$value" ;;
+        float) validate_float "$value" ;;
+        bool) validate_bool "$value" ;;
+        string) validate_string "$value" ;;
+        *) error_message "Unknown type '$type'"; return 1 ;;
+    esac
 }
