@@ -236,7 +236,7 @@ insert_into_table() {
             string)
                 # Strings should be enclosed in quotes
                 if [[ ! "${values[$i]}" =~ ^\".*\"$ ]]; then
-                    error_message "Invalid data type for column '${columns[$i]}'. Expected string (enclosed in quotes), got '${values[$i]}'."
+                    error_message "'${values[$i]}' : Invalid data for '${columns[$i]}'. Expected(string | Fname_Lname | ....))."
                     return 1
                 fi
                 ;;
