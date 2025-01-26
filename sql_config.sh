@@ -7,3 +7,5 @@ NAMEDATALEN=16
 CASE_INSENSITIVE_NAMES=true
 
 CURRENT_DB=""
+
+KEYWORDS=(create use drop delete from where insert into values select set update table)

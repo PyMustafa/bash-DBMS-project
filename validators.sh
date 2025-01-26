@@ -8,12 +8,20 @@ source utils.sh
 validate_name() {
     local name="$1"
     local type="$2"
+    local normalized_name=$(normalize_name "$name")
 
     # empty check
     [[ -z "$name" ]] && {
         error_message "$type name cannot be empty"
         return 1
     }
+    # check if the name is a reserved keyword
+    for keyword in "${KEYWORDS[@]}"; do
+        [[ "$normalized_name" == "$keyword" ]] && {
+            error_message "$type name cannot be a reserved keyword: $name"
+            return 1
+    }
+    done
 
     # naming rules
     [[ ! "$name" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] && {

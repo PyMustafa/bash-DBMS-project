@@ -21,3 +21,7 @@ gum style --foreground 82 "$1"
 info_message(){
 gum style --foreground 39 "$1"
 }
+
+invalid_query_message(){
+    error_message "Invalid query, $1"
+}

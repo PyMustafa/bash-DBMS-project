@@ -4,6 +4,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 . "${SCRIPT_DIR}/utils.sh"
 . "${SCRIPT_DIR}/validators.sh"
 . "${SCRIPT_DIR}/database_functions.sh"
+. "${SCRIPT_DIR}/select.sh"
 clear
 
 # display welcome message
@@ -44,6 +45,15 @@ parse_sql_query() {
                 return 1
             }
             use_database "${queryWords[1]}"
+            return 0
+            ;;
+            "select")
+            
+            [[ -z "$current_db" ]] && {
+                error_message "you are not connected to a database. Use 'use db_name' first."
+                return 1
+            }
+            execute_select "${queryWords[@]}"
             return 0
             ;;
         "disconnect")
@@ -89,7 +99,7 @@ parse_sql_query() {
             drop_table
             ;;
         *)
-            error_message "Unrecognized command: ${queryWords[*]}"
+            error_message "Invalid input: ${queryWords[*]}"
             return 1
             ;;
     esac
