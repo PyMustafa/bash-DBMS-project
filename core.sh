@@ -6,6 +6,8 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 . "${SCRIPT_DIR}/database_functions.sh"
 . "${SCRIPT_DIR}/select.sh"
 . "${SCRIPT_DIR}/update.sh"
+. "${SCRIPT_DIR}/delete.sh"
+
 clear
 
 # display welcome message
@@ -124,6 +126,13 @@ parse_sql_query() {
             }
             insert_into_table "${queryWords[2]}" "${queryWords[@]:4}"
             ;;
+        "delete from")
+            [[ -z "$current_db" ]] && {
+                error_message "You are not connected to a database. Use 'use db_name' first."
+                return 1
+            }
+            delete_from_table "${queryWords[@]}"
+            ;;
         *)
             error_message "Invalid input: ${queryWords[*]}"
             return 1
@@ -134,7 +143,7 @@ parse_sql_query() {
 main() {
     gum style --foreground 141 "'exit', '-help' or 'clear'"
     # Array of valid SQL keywords for each function
-    keywords=("create" "drop" "list" "use" "exit" "show" "insert")
+    keywords=("create" "drop" "list" "use" "exit" "show" "insert" "delete")
 
     while true; do
         query=$(gum input --placeholder "Enter SQL query or command" --prompt "> ")
