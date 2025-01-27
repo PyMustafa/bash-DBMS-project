@@ -29,32 +29,29 @@ invalid_query_message(){
 
 # Comparison functions
 compare_numbers() {
-    local a="$1" b="$2" op="$3"
-    case $op in
-        "=")  [[ $(echo "$a == $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        "!=") [[ $(echo "$a != $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        "<")  [[ $(echo "$a < $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        ">")  [[ $(echo "$a > $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        "<=") [[ $(echo "$a <= $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        ">=") [[ $(echo "$a >= $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
-        *)    echo "false" ;;
+    local val1="$1" val2="$2" op="$3"
+    case "$op" in
+        "=")  result=$(echo "$val1 == $val2" | bc -l) ;;
+        "!=") result=$(echo "$val1 != $val2" | bc -l) ;;
+        "<")  result=$(echo "$val1 < $val2" | bc -l) ;;
+        ">")  result=$(echo "$val1 > $val2" | bc -l) ;;
+        "<=") result=$(echo "$val1 <= $val2" | bc -l) ;;
+        ">=") result=$(echo "$val1 >= $val2" | bc -l) ;;
+        *)    echo "false"; return 1 ;;
     esac
+    [[ "$result" -eq 1 ]] && echo "true" || echo "false"
 }
 
 compare_strings() {
-    local a="$1" b="$2" op="$3"
-    case $op in
-        "=")  [[ "$a" == "$b" ]] && echo "true" || echo "false" ;;
-        "!=") [[ "$a" != "$b" ]] && echo "true" || echo "false" ;;
+    local val1="$1" val2="$2" op="$3"
+    case "$op" in
+        "=")  [[ "$val1" == "$val2" ]] && echo "true" || echo "false" ;;
+        "!=") [[ "$val1" != "$val2" ]] && echo "true" || echo "false" ;;
         *)    echo "false" ;;
     esac
 }
 
 compare_booleans() {
-    local a="$1" b="$2" op="$3"
-    case $op in
-        "=")  [[ "$a" == "$b" ]] && echo "true" || echo "false" ;;
-        "!=") [[ "$a" != "$b" ]] && echo "true" || echo "false" ;;
-        *)    echo "false" ;;
-    esac
+    local val1="$1" val2="$2" op="$3"
+    compare_strings "$val1" "$val2" "$op"  # Reuse string comparison
 }

@@ -1,8 +1,6 @@
 #!/bin/bash
 execute_select() {
     local queryWords=("$@")
-    local tableName="${queryWords[$fromIndex+1]}"
-    local columns=("${queryWords[@]:1:$((fromIndex-1))}")
     local valid=true
     local where=false
 
@@ -18,7 +16,8 @@ execute_select() {
         return 1
     }
 
-    # validate table exists
+        # validate table exists
+    local tableName="${queryWords[$fromIndex+1]}"
     local normalized_tableName=$(normalize_name "$tableName")
     local tableFile="${current_db}/${normalized_tableName}.csv"
     local metadataFile="${current_db}/.${normalized_tableName}"
@@ -46,6 +45,7 @@ execute_select() {
         where=true
     fi
 
+    local columns=("${queryWords[@]:1:$((fromIndex-1))}")
     # validate selected columns
     if [[ "${columns[0]}" == "all" ]]; then
         columns=("${columns_metadata[@]}")
