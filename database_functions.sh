@@ -189,7 +189,7 @@ create_table() {
 insert_into_table() {
     local table_name="$1"
     shift
-    local values=("$@")
+    local values_str="$*"  # Capture all arguments as a single string
 
     # Check if a database is selected
     [[ -z "$current_db" ]] && {
@@ -211,6 +211,17 @@ insert_into_table() {
     local columns=($(grep "^columns:" "$metadata_file" | cut -d':' -f2 | tr ',' ' '))
     local column_types=($(grep "^types:" "$metadata_file" | cut -d':' -f2 | tr ',' ' '))
     local primary_key=$(grep "^primary_key:" "$metadata_file" | cut -d':' -f2)
+
+    # Parse values with quotes
+    local values=()
+    while [[ "$values_str" =~ ^[[:space:]]*(\"([^\"]*)\"|([^[:space:]]+)) ]]; do
+        if [[ -n "${BASH_REMATCH[2]}" ]]; then
+            values+=("${BASH_REMATCH[2]}")
+        else
+            values+=("${BASH_REMATCH[3]}")
+        fi
+        values_str="${values_str#${BASH_REMATCH[0]}}"
+    done
 
     # Validate number of values
     [[ ${#values[@]} -ne ${#columns[@]} ]] && {
@@ -234,10 +245,9 @@ insert_into_table() {
                 fi
                 ;;
             string)
-                # Strings should be enclosed in quotes
+                # Auto-add quotes if missing
                 if [[ ! "${values[$i]}" =~ ^\".*\"$ ]]; then
-                    error_message "'${values[$i]}' : Invalid data for '${columns[$i]}'. Expected(string | Fname_Lname | ....))."
-                    return 1
+                    values[$i]="\"${values[$i]}\""
                 fi
                 ;;
             bool)
@@ -262,7 +272,7 @@ insert_into_table() {
         return 1
     fi
 
-    # Insert into CSV (using commas)
+    # Insert into CSV
     echo "$(IFS=,; echo "${values[*]}")" >> "$table_file"
     success_message "Data inserted successfully into '$table_name'."
 }
