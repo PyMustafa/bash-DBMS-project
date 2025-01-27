@@ -5,6 +5,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 . "${SCRIPT_DIR}/validators.sh"
 . "${SCRIPT_DIR}/database_functions.sh"
 . "${SCRIPT_DIR}/select.sh"
+. "${SCRIPT_DIR}/update.sh"
 clear
 
 # display welcome message
@@ -12,16 +13,15 @@ gum style --foreground 212 --border-foreground 212 --border double --align cente
 
 help_menu() {
     gum style --foreground 156 "Valid SQL Commands (not case sensitive):"
-    gum style --foreground 39 "CREATE DATABASE <name>"
-    gum style --foreground 39 "DROP DATABASE <name>"
-    gum style --foreground 39 "USE <database>"
-    gum style --foreground 39 "LIST DB"
+    info_message "CREATE DATABASE <name>"
+    info_message "DROP DATABASE <name>"
+    info_message "USE <database>"
+    info_message "LIST DB"
 
-    gum style --foreground 39 "SHOW TABLES"
-    gum style --foreground 39 "CREATE TABLE <name> <columns...>"
-    gum style --foreground 39 "INSERT INTO <TABLE_NAME> VALUES <value1> <value2> ..."
-    gum style --foreground 39 "Avaliable Datatypes: INT,FLOOT,BOOL,STRING"
-    gum style --foreground 39 "EXIT"
+    info_message "SHOW TABLES"
+    info_message "CREATE TABLE <Table_name> <col1(type)> <col2(type)> ..."
+    info_message "Avaliable Datatypes: INT,FLOOT,BOOL,STRING"
+    info_message "EXIT"
     echo ""
 }
 
@@ -58,6 +58,15 @@ parse_sql_query() {
                 return 1
             }
             execute_select "${queryWords[@]}"
+            return 0
+            ;;
+            "update")
+            
+            [[ -z "$current_db" ]] && {
+                error_message "you are not connected to a database. Use 'use db_name' first."
+                return 1
+            }
+            execute_update "${queryWords[@]}"
             return 0
             ;;
         "disconnect")
