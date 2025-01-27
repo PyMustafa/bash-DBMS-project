@@ -71,13 +71,10 @@ validate_data() {
 
 validate_where_clause() {
     local tableName="$1"
-    info_message "$tableName"
     shift
     local whereClause=("$@")
     local normalized_tableName=$(normalize_name "$tableName")
     local metadataFile="$current_db/.$normalized_tableName"
-    info_message "${#whereClause[@]}" 
-    info_message "${whereClause[@]}" 
     # Validate clause structure
     if [[ ${#whereClause[@]} -ne 3 ]]; then
         error_message "Invalid WHERE format. Required: COLUMN OPERATOR VALUE"

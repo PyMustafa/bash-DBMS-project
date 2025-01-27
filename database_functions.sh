@@ -199,7 +199,7 @@ insert_into_table() {
 
     # Path to the table and metadata files
     local table_file="${current_db}/${table_name}.csv"
-    local metadata_file="${current_db}/.${table_name}_metadata"
+    local metadata_file="${current_db}/.${table_name}"
 
     # Check if table exists
     [[ ! -f "$table_file" || ! -f "$metadata_file" ]] && {
@@ -309,7 +309,7 @@ drop_table() {
 
     # Define table and metadata file paths
     local table_file="${current_db}/${table_name}.csv"
-    local metadata_file="${current_db}/.${table_name}_metadata"
+    local metadata_file="${current_db}/.${table_name}"
 
     # Check if table exists
     if [[ ! -f "$table_file" && ! -f "$metadata_file" ]]; then

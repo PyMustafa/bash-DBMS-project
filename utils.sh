@@ -25,3 +25,36 @@ gum style --foreground 39 "$1"
 invalid_query_message(){
     error_message "Invalid query, $1"
 }
+
+
+# Comparison functions
+compare_numbers() {
+    local a="$1" b="$2" op="$3"
+    case $op in
+        "=")  [[ $(echo "$a == $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        "!=") [[ $(echo "$a != $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        "<")  [[ $(echo "$a < $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        ">")  [[ $(echo "$a > $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        "<=") [[ $(echo "$a <= $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        ">=") [[ $(echo "$a >= $b" | bc) -eq 1 ]] && echo "true" || echo "false" ;;
+        *)    echo "false" ;;
+    esac
+}
+
+compare_strings() {
+    local a="$1" b="$2" op="$3"
+    case $op in
+        "=")  [[ "$a" == "$b" ]] && echo "true" || echo "false" ;;
+        "!=") [[ "$a" != "$b" ]] && echo "true" || echo "false" ;;
+        *)    echo "false" ;;
+    esac
+}
+
+compare_booleans() {
+    local a="$1" b="$2" op="$3"
+    case $op in
+        "=")  [[ "$a" == "$b" ]] && echo "true" || echo "false" ;;
+        "!=") [[ "$a" != "$b" ]] && echo "true" || echo "false" ;;
+        *)    echo "false" ;;
+    esac
+}
