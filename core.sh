@@ -20,7 +20,11 @@ help_menu() {
 
     info_message "SHOW TABLES"
     info_message "CREATE TABLE <Table_name> <col1(type)> <col2(type)> ..."
-    info_message "Avaliable Datatypes: INT,FLOOT,BOOL,STRING"
+    info_message "Avaliable Datatypes: INT,FLOAT,BOOL,STRING"
+    info_message "DROP TABLE <table_name>"
+    info_message "INSERT INTO <table_name> VALUES <value1>, <value2>, ..."
+    info_message "SELECT all FROM <table_name>", "SELECT <columns> FROM <table_name>"
+    info_message "UPDATE <table_name> SET <column_name> = <value> WHERE <column_name> = <value>"
     info_message "EXIT"
     echo ""
 }
@@ -128,14 +132,16 @@ parse_sql_query() {
 }
 
 main() {
-    gum style --foreground 141 "'exit' to exit the DBMS, '-help' for help menu"
+    gum style --foreground 141 "'exit', '-help' or 'clear'"
     # Array of valid SQL keywords for each function
     keywords=("create" "drop" "list" "use" "exit" "show" "insert")
 
     while true; do
-        query=$(gum input --placeholder "Enter SQL query" --prompt "> ")
-        if [[ "$query" == "exit" ]]; then
+        query=$(gum input --placeholder "Enter SQL query or command" --prompt "> ")
+        if [[ "${query,,}" == "exit" ]]; then
             gum confirm "Are you sure you want to exit?" && break;
+        elif [[ "${query,,}" == "clear" ]]; then
+            clear
         else
             parse_sql_query "$query"
         fi
