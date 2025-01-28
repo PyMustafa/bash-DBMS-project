@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# Check if gum is installed
+if ! command -v gum &> /dev/null; then
+    echo -e "\033[1;31mError: Gum is required but not installed.\033[0m"
+    echo -e "Please run \033[1;34m./install.sh\033[0m to install dependencies"
+    echo -e "Or install manually: \033[4;34mhttps://github.com/charmbracelet/gum#installation\033[0m"
+    exit 1
+fi
+
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd -P)
 # source dependencies using absolute paths
 . "${SCRIPT_DIR}/utils.sh"
